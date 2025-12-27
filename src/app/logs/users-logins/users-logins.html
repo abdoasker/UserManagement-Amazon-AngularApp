@@ -1,0 +1,43 @@
+<div class="container mt-3">
+  <h4>User Login Activities</h4>
+
+  <div *ngIf="loading" class="text-muted">Loading...</div>
+
+  <table
+    *ngIf="!loading && logins.length > 0"
+    class="table table-bordered table-striped mt-3"
+  >
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Email</th>
+        <th>IP Address</th>
+        <th>Attempt</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let login of logins">
+        <td>{{ login.userId }}</td>
+        <td>{{ login.email }}</td>
+        <td>{{ login.ipAddress }}</td>
+        <td>
+          <span
+            class="badge"
+            [ngClass]="{
+              'bg-success': login.attempt === 'Success',
+              'bg-danger': login.attempt === 'Failed'
+            }"
+          >
+            {{ login.attempt }}
+          </span>
+        </td>
+        <td>{{ login.timestamp | date : "short" }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!loading && logins.length === 0" class="text-muted">
+    No login activities found.
+  </div>
+</div>

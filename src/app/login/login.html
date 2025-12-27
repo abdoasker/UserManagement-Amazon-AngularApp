@@ -1,0 +1,127 @@
+<div class="container py-4">
+  <h1 class="mb-4 text-center">
+    <fa-icon [icon]="faUser" class="me-2"></fa-icon> Login
+  </h1>
+
+  <div *ngIf="loginSuccess" class="alert alert-success">
+    Registration successful! You can now log in.
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <form
+    [formGroup]="loginForm"
+    (ngSubmit)="onSubmit()"
+    class="shadow-sm p-4 rounded bg-light mx-auto"
+    style="max-width: 600px"
+  >
+    <!-- Email Field -->
+    <div class="mb-3">
+      <label for="email" class="form-label">
+        <fa-icon [icon]="faEnvelope" class="me-2"></fa-icon> Email
+      </label>
+      <input
+        type="email"
+        id="email"
+        formControlName="email"
+        class="form-control"
+        [ngClass]="{
+          'is-invalid':
+            (f['email'].touched || f['email'].dirty) && f['email'].errors
+        }"
+        required
+      />
+      <div *ngIf="f['email'].errors" class="invalid-feedback">
+        <div *ngIf="f['email'].errors['required']">Email is required</div>
+        <div *ngIf="f['email'].errors['email']">Please enter a valid email</div>
+      </div>
+    </div>
+
+    <!-- Password Field -->
+    <div class="mb-3">
+      <label for="password" class="form-label">
+        <fa-icon [icon]="faLock" class="me-2"></fa-icon> Password
+      </label>
+      <div class="input-group">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          [ngClass]="{
+            'is-invalid':
+              (f['password'].touched || f['password'].dirty) &&
+              f['password'].errors
+          }"
+          required
+        />
+        <button
+          class="btn btn-outline-secondary"
+          type="button"
+          (click)="togglePasswordVisibility()"
+        >
+          <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
+        </button>
+        <div *ngIf="f['password'].errors" class="invalid-feedback">
+          <div *ngIf="f['password'].errors['required']">
+            Password is required
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Picture URL -->
+    <div class="mb-4">
+      <div
+        class="d-flex flex-lg-row flex-column align-items-center justify-content-between"
+      >
+        <label for="isPersistent" class="form-label">
+          <fa-icon [icon]="faSave" class="me-2"></fa-icon> Keep me logged
+        </label>
+        <input
+          type="checkbox"
+          id="isPersistent"
+          class="form-check me-lg-5"
+          formControlName="isPersistent"
+        />
+        <a
+          routerLinkActive="active"
+          routerLink="/account/register"
+          class="link-primary ms-lg-5 pointer"
+          (click)="goRegister()"
+          >Dont have account? Register Now</a
+        >
+      </div>
+    </div>
+
+    <div class="d-grid">
+      <button
+        type="submit"
+        class="btn btn-primary btn-lg"
+        [disabled]="loginForm.invalid || isSubmitting"
+      >
+        <fa-icon [icon]="faCheck" class="me-2"></fa-icon>
+        {{ isSubmitting ? "Loging..." : "Login" }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-dark mt-3 btn-lg"
+        (click)="onGoogleSignIn()"
+      >
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" class="me-2" />
+        Continue with Google
+      </button>
+      <button
+        type="button"
+        (click)="goResetPassword()"
+        class="btn btn-danger mt-3 btn-lg"
+        [disabled]="f['email'].invalid || isClicked"
+      >
+        <fa-icon [icon]="faArrowsRotate" class="me-2"></fa-icon>
+        {{ isClicked ? "Resetting..." : "Reset Password" }}
+      </button>
+    </div>
+  </form>
+</div>

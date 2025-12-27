@@ -1,0 +1,330 @@
+<!-- profile.html -->
+<div class="container py-4">
+  <h2 class="mb-4">My Profile</h2>
+
+  <div *ngIf="loading">Loading...</div>
+
+  <!-- Personal -->
+  <div class="shadow-sm p-4 rounded bg-light mb-4">
+    <h4>Personal Information</h4>
+
+    <!-- View Mode -->
+    <div class="row" *ngIf="!editingProfile; else editProfileTpl">
+      <p class="col-lg-4 col-12"><strong>Email:</strong> {{ user?.email }}</p>
+      <p class="col-lg-4 col-12">
+        <strong>Full Name:</strong> {{ user?.fullName }}
+      </p>
+      <p class="col-lg-4 col-12"><strong>Region:</strong> {{ user?.region }}</p>
+      <p class="col-lg-4 col-12">
+        <strong>Date of Birth:</strong> {{ user?.birthdate | date }}
+      </p>
+
+      <button class="btn btn-warning" (click)="startEditProfile()">Edit</button>
+    </div>
+
+    <!-- Edit Mode -->
+    <ng-template #editProfileTpl>
+      <form [formGroup]="profileForm" (ngSubmit)="onSave()">
+        <div class="mb-3">
+          <label class="form-label">Email / UserName</label>
+          <p class="form-control-plaintext">{{ user?.email }}</p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-control" formControlName="fullName" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Region</label>
+          <input type="text" class="form-control" formControlName="region" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Date of Birth</label>
+          <input type="date" class="form-control" formControlName="birthdate" />
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button
+            class="btn btn-primary me-2"
+            type="submit"
+            [disabled]="profileForm.invalid"
+          >
+            Save
+          </button>
+          <button
+            class="btn btn-secondary"
+            type="button"
+            (click)="cancelEditProfile()"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </ng-template>
+  </div>
+
+  <!-- Addresses -->
+  <div class="shadow-sm p-4 rounded bg-light mb-4">
+    <h4 class="d-flex justify-content-between align-items-center">
+      <span>Addresses</span>
+      @if(this.addresses.length <5){
+      <button
+        class="btn btn-outline-primary"
+        (click)="showAddAddress = !showAddAddress"
+      >
+        <fa-icon
+          [icon]="showAddAddress == true ? faMinusCircle : faPlusCircle"
+          class="fa-lg"
+        ></fa-icon>
+      </button>
+      }
+    </h4>
+
+    <ng-container *ngIf="addresses && addresses.length > 0; else noAddresses">
+      <ul class="list-group mb-3">
+        <li
+          class="list-group-item d-flex mb-3 flex-column"
+          *ngFor="let addr of addresses"
+        >
+          <!-- Display mode -->
+          <div
+            *ngIf="editingAddressId !== addr.addressId; else editAddressTpl"
+            class="row gap-md-0 gap-2 justify-content-between align-items-center"
+          >
+            <div class="col-md-6 col-12">
+              {{ addr.street }}, {{ addr.city }}, {{ addr.country }}
+              <span class="badge ms-2 bg-success" *ngIf="addr.isDefault">
+                Default
+              </span>
+            </div>
+            <div class="col-md-6 col-12 text-end mt-2 mt-md-0">
+              <button
+                class="btn btn-sm btn-outline-success me-2"
+                *ngIf="!addr.isDefault"
+                (click)="setAddressDefault(user?.id!, addr.addressId!)"
+              >
+                Set As Default
+              </button>
+              <button
+                class="btn btn-sm btn-warning me-2"
+                (click)="startEditAddress(addr.addressId!)"
+              >
+                Edit
+              </button>
+              <button
+                class="btn btn-sm btn-danger"
+                (click)="deleteAddress(addr.addressId!)"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <!-- Edit mode -->
+          <ng-template #editAddressTpl>
+            <div class="d-flex flex-column">
+              <input
+                type="text"
+                class="form-control mb-2"
+                [(ngModel)]="addr.street"
+              />
+              <input
+                type="text"
+                class="form-control mb-2"
+                [(ngModel)]="addr.city"
+              />
+              <input
+                type="text"
+                class="form-control mb-2"
+                [(ngModel)]="addr.country"
+              />
+
+              <div class="d-flex justify-content-end">
+                <button
+                  class="btn btn-sm btn-primary me-2"
+                  (click)="saveAddress(addr)"
+                >
+                  Save
+                </button>
+                <button
+                  class="btn btn-sm btn-secondary"
+                  (click)="cancelEditAddress()"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </ng-template>
+        </li>
+      </ul>
+    </ng-container>
+
+    <ng-template #noAddresses>
+      <div class="text-muted mb-3">No addresses yet.</div>
+    </ng-template>
+
+    <!-- Add Address Form (toggle) -->
+    <div
+      *ngIf="showAddAddress"
+      class="mb-2 d-flex flex-column gap-4 mt-2 border p-3 rounded bg-white"
+    >
+      <input type="text" class="form-control" placeholder="Street" #street />
+      <input type="text" class="form-control" placeholder="City" #city />
+      <input type="text" class="form-control" placeholder="State" #state />
+      <input type="text" class="form-control" placeholder="Country" #country />
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          id="isDefault"
+          type="checkbox"
+          #isDefault
+        />
+        <label class="form-check-label" for="isDefault">Set as default</label>
+      </div>
+      <button
+        class="btn btn-success"
+        (click)="
+          addAddress({
+            street: street.value,
+            city: city.value,
+            state: state.value,
+            country: country.value,
+            isDefault: isDefault.checked
+          });
+          showAddAddress = false
+        "
+      >
+        Save Address
+      </button>
+    </div>
+  </div>
+
+  <!-- Phones -->
+  <div class="shadow-sm p-4 rounded bg-light mb-4">
+    <h4 class="d-flex justify-content-between align-items-center">
+      <span>Phones</span>
+      @if(this.phones.length <5){
+      <button
+        class="btn btn-outline-primary"
+        (click)="showAddPhone = !showAddPhone"
+      >
+        <fa-icon
+          [icon]="showAddPhone == true ? faMinusCircle : faPlusCircle"
+          class="fa-lg"
+        ></fa-icon>
+      </button>
+      }
+    </h4>
+
+    <ng-container *ngIf="phones && phones.length > 0; else noPhones">
+      <ul class="list-group mb-3">
+        <li
+          class="list-group-item mb-3 d-flex flex-column"
+          *ngFor="let phone of phones"
+        >
+          <!-- Display mode -->
+          <div
+            *ngIf="editingPhoneId !== phone.phoneId; else editPhoneTpl"
+            class="d-flex justify-content-between align-items-center"
+          >
+            <div>
+              {{ phone.phoneNumber }}
+              <span class="badge ms-2 bg-success" *ngIf="phone.isDefault">
+                Default
+              </span>
+            </div>
+            <div>
+              <button
+                *ngIf="!phone.isDefault"
+                class="btn btn-sm btn-outline-success me-2"
+                (click)="setPhoneDefault(user?.id!, phone.phoneId!)"
+              >
+                Set As Default
+              </button>
+              <button
+                class="btn btn-sm btn-warning me-2"
+                (click)="startEditPhone(phone.phoneId!)"
+              >
+                Edit
+              </button>
+              <button
+                class="btn btn-sm btn-danger"
+                (click)="deletePhone(phone.phoneId!)"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <!-- Edit mode -->
+          <ng-template #editPhoneTpl>
+            <div class="d-flex flex-column">
+              <input
+                type="text"
+                class="form-control mb-2"
+                [(ngModel)]="phone.phoneNumber"
+              />
+
+              <div class="d-flex justify-content-end">
+                <button
+                  class="btn btn-sm btn-primary me-2"
+                  (click)="savePhone(phone)"
+                >
+                  Save
+                </button>
+                <button
+                  class="btn btn-sm btn-secondary"
+                  (click)="cancelEditPhone()"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </ng-template>
+        </li>
+      </ul>
+    </ng-container>
+
+    <ng-template #noPhones>
+      <div class="text-muted mb-3">No phones yet.</div>
+    </ng-template>
+
+    <!-- Add Phone Form (toggle) -->
+    <div
+      *ngIf="showAddPhone"
+      class="mb-2 d-flex flex-column gap-4 mt-2 border p-3 rounded bg-white"
+    >
+      <input
+        type="text"
+        class="form-control mb-2"
+        placeholder="Phone Number"
+        #number
+      />
+      <div class="form-check mb-2">
+        <input
+          class="form-check-input"
+          id="isDefaultPhone"
+          type="checkbox"
+          #isDefaultPhone
+        />
+        <label class="form-check-label" for="isDefaultPhone"
+          >Set as default</label
+        >
+      </div>
+      <button
+        class="btn btn-success"
+        (click)="
+          addPhone({
+            phoneNumber: number.value,
+            isDefault: isDefaultPhone.checked
+          });
+          showAddPhone = false
+        "
+      >
+        Save Phone
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="message" class="alert alert-info mt-3">{{ message }}</div>
+</div>

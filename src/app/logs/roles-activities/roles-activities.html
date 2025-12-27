@@ -1,0 +1,29 @@
+<div class="container mt-3">
+  <h4>Roles Activities</h4>
+
+  <div *ngIf="loading" class="text-muted">Loading...</div>
+
+  <table
+    *ngIf="!loading && activities.length > 0"
+    class="table table-bordered table-striped mt-3"
+  >
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Action</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let activity of activities">
+        <td>{{ activity.roleId }}</td>
+        <td>{{ activity.action }}</td>
+        <td>{{ activity.timestamp | date : "short" }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!loading && activities.length === 0" class="text-muted">
+    No activities found.
+  </div>
+</div>

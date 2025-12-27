@@ -1,0 +1,45 @@
+<div class="container mt-4">
+  <h3>User Activities</h3>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="text-center my-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading activities...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Activities Table -->
+  <h3></h3>
+  <table
+    *ngIf="!isLoading && activities.length"
+    class="table table-bordered table-striped mt-3"
+  >
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Email</th>
+        <th>Action</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let activity of activities; let i = index">
+        <td>{{ i + 1 }}</td>
+        <th>{{ activity.email }}</th>
+        <td>{{ activity.action }}</td>
+        <td>{{ activity.timestamp | date : "short" }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Empty state -->
+  <div *ngIf="!isLoading && !activities.length && !errorMessage">
+    <div class="alert alert-info">No activities found for this user.</div>
+  </div>
+</div>

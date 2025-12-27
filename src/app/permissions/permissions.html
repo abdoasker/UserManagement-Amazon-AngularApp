@@ -1,0 +1,128 @@
+<div class="container mt-4">
+  <h2 class="mb-3">Permissions Management</h2>
+
+  <!-- Add Permission -->
+  <div class="row g-2 mb-3">
+    <div class="col-md-4">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Enter task (e.g., Product-Add)"
+        [(ngModel)]="newPermission.task"
+        [disabled]="isLoading"
+      />
+    </div>
+    <div class="col-md-6">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Enter description"
+        [(ngModel)]="newPermission.description"
+        [disabled]="isLoading"
+      />
+    </div>
+    <div class="col-md-2 d-grid">
+      <button
+        class="btn btn-success"
+        (click)="createPermission()"
+        [disabled]="
+          !newPermission.task.trim() ||
+          !newPermission.description.trim() ||
+          isLoading
+        "
+      >
+        Add Permission
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="text-center my-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading permissions...</p>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Permissions list -->
+  <div class="row g-3" *ngIf="!isLoading && permissions.length">
+    <div class="col-md-6 col-lg-4" *ngFor="let permission of permissions">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <!-- Edit mode -->
+          <div *ngIf="editingPermissionId === permission.id; else viewMode">
+            <input
+              type="text"
+              class="form-control mb-2"
+              [(ngModel)]="editingPermission.task"
+              [disabled]="isLoading"
+            />
+            <textarea
+              class="form-control mb-2"
+              [(ngModel)]="editingPermission.description"
+              rows="2"
+              [disabled]="isLoading"
+            ></textarea>
+            <button
+              class="btn btn-sm btn-primary me-2"
+              (click)="saveEdit()"
+              [disabled]="
+                !editingPermission.task.trim() ||
+                !editingPermission.description.trim() ||
+                isLoading
+              "
+            >
+              Save
+            </button>
+            <button
+              class="btn btn-sm btn-secondary"
+              (click)="cancelEdit()"
+              [disabled]="isLoading"
+            >
+              Cancel
+            </button>
+          </div>
+
+          <!-- View mode -->
+          <ng-template #viewMode>
+            <h6 class="card-title text-primary">
+              <i class="fa-solid fa-key me-2"></i>
+              {{ permission.task }}
+            </h6>
+            <p class="card-text text-muted">{{ permission.description }}</p>
+
+            <div class="d-flex justify-content-end">
+              <button
+                class="btn btn-sm btn-outline-primary me-2"
+                (click)="startEdit(permission)"
+                [disabled]="isLoading"
+              >
+                <i class="fa-solid fa-pen"></i> Edit
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                (click)="deletePermission(permission.id)"
+                [disabled]="isLoading"
+              >
+                <i class="fa-solid fa-trash"></i> Delete
+              </button>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div
+    *ngIf="!isLoading && !permissions.length && !errorMessage"
+    class="alert alert-info"
+  >
+    No permissions found.
+  </div>
+</div>
